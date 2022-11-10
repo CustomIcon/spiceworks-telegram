@@ -1,0 +1,9 @@
+[spiceworks-bot]
+id = 1
+hash = ""
+owner_id = 1
+
+[spiceworks-help-desk]
+auth = ""
+set_cookies = ""
+host = ""
