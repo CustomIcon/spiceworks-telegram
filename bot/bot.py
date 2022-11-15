@@ -22,6 +22,7 @@ class bot(Client):
         aioclient = ClientSession,
     ):
         self.plugins = {'root': path.join(__package__, 'plugins')}
+        self.config = config
         self.host = host
         self.url = f"http://{self.host}"
         self.auth = auth
