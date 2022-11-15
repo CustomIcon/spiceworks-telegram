@@ -104,3 +104,19 @@ async def _(_, query: types.InlineQuery):
         results=queue,
         cache_time=0
     )
+
+@bot.on_message(filters.user(bot.config.getint('spiceworks-bot', 'owner_id')) & filters.command('start'))
+async def _(_, message: types.Message):
+    return await message.reply(
+        "Please select an option from down below",
+        reply_markup=types.InlineKeyboardMarkup(
+            [
+                [
+                    types.InlineKeyboardButton('Open Tickets', switch_inline_query="open")
+                ],
+                [
+                    types.InlineKeyboardButton('Closed Tickets', switch_inline_query="closed")
+                ]
+            ]
+        )
+    )
