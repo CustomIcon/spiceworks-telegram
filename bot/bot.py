@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from io import BytesIO
+import spiceworks
 from os import path
 
 from aiohttp import ClientSession
@@ -45,11 +45,29 @@ class bot(Client):
             workdir="./",
         )
     
-    async def get_tickets(self, ticket_id: int = None):
+    async def get_tickets(self, ticket_id: int = None, filter_id: "spiceworks.types.Ticket" = None):
+        """Get tickets from spiceworks instance.
+        Parameters:
+            ticket_id (``int``):
+                Unique identifier (int) of a ticket.
+            filter_id (:obj:`~spiceworks.types.Ticket`, *optional*):
+                Pass a filter in order to search for specific kind of ticket.
+                Defaults to (:obj:`~spiceworks.types.Ticket.ALL`).
+        Returns:
+            ``List``: A list of Tickets.
+        Example:
+            .. code-block:: python
+                # Get all tickets
+                tickets = await client.get_tickets()
+                # Search for a specific ticket corrosponding to an unique idenitifier
+                tickets = await client.get_tickets(69)
+                # Search for all CLOSED tickets
+                tickets = await client.get_tickets(filter_id=spiceworks.types.Ticket.CLOSED)
+        """
         req = await self.aioclient.get(
             f'{self.url}/api/tickets/{ticket_id}.json'
         ) if ticket_id else await self.aioclient.get(
-            f'{self.url}/api/tickets.json'
+            f'{self.url}/api/tickets.json?filter={filter_id or spiceworks.types.Ticket.ALL}'
         )
         return await req.json()
 
