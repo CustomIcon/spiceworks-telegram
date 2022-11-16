@@ -1,9 +1,10 @@
-from pyrogram import filters, types
-import json
-from bot import bot
-from spiceworks.types import Ticket
-from bot.utils import GetOpt
+from json import decoder
 
+from pyrogram import filters, types
+
+from bot import bot
+from bot.utils import GetOpt
+from spiceworks.types import Ticket
 
 text = """
 #{ticket_id}
@@ -34,7 +35,7 @@ async def _(_, message: types.Message):
             ]
         ]
     reply_markup.append(GetOpt(status=ticket["status"]))
-    await message.reply(
+    return await message.reply(
         text=text.format(
             ticket_id=ticket["id"],
             created_at=ticket["created_at"],
@@ -53,7 +54,7 @@ async def _(_, message: types.Message):
 async def _(_, query: types.CallbackQuery):
     try:
         ticket = (await bot.get_tickets(int(query.data.split("_")[1])))
-    except json.decoder.JSONDecodeError:
+    except decoder.JSONDecodeError:
         return await query.answer("That is the End of All tickets!", show_alert=True)
     reply_markup = [
             [
@@ -68,7 +69,7 @@ async def _(_, query: types.CallbackQuery):
             ]
         ]
     reply_markup.append(GetOpt(status=ticket["status"]))
-    await query.message.edit(
+    return await query.message.edit(
         text=text.format(
             ticket_id=ticket["id"],
             created_at=ticket["created_at"],
@@ -85,37 +86,45 @@ async def _(_, query: types.CallbackQuery):
 
 @bot.on_inline_query(filters.user(bot.config.getint('spiceworks-bot', 'owner_id')))
 async def _(_, query: types.InlineQuery):
-    queue = []
     if query.query.lower() == "closed":
         tickets = (await bot.get_tickets(filter_id=Ticket.CLOSED))
     elif query.query.lower() == "open":
         tickets = (await bot.get_tickets(filter_id=Ticket.OPEN))
     else:
         return
-    for ticket in tickets:
-        queue.append(
-            types.InlineQueryResultArticle(
-                title=f"{ticket['id']} {ticket['summary']}",
-                description=f'Assigned by: {ticket["creator"]["email"]}',
-                input_message_content=types.InputTextMessageContent(f"/ticket {ticket['id']}")
-            )
-        )
+    queue = [
+        types.InlineQueryResultArticle(
+            title=f"{ticket['id']} {ticket['summary']}",
+            description=f'Assigned by: {ticket["creator"]["email"]}',
+            input_message_content=types.InputTextMessageContent(f"/ticket {ticket['id']}")
+        ) for ticket in tickets
+    ]
+
     return await query.answer(
         results=queue,
         cache_time=0
     )
 
+
 @bot.on_message(filters.user(bot.config.getint('spiceworks-bot', 'owner_id')) & filters.command('start'))
 async def _(_, message: types.Message):
+    tickets = await bot.get_tickets()
+    open_tickets = []
+    closed_tickets = []
+    for ticket in tickets:
+        if ticket["status"] == "closed":
+            closed_tickets.append(ticket)
+        else:
+            open_tickets.append(ticket)
     return await message.reply(
         "Please select an option from down below",
         reply_markup=types.InlineKeyboardMarkup(
             [
                 [
-                    types.InlineKeyboardButton('Open Tickets', switch_inline_query="open")
+                    types.InlineKeyboardButton(f'Open Tickets - {len(open_tickets)}', switch_inline_query_current_chat="open")
                 ],
                 [
-                    types.InlineKeyboardButton('Closed Tickets', switch_inline_query="closed")
+                    types.InlineKeyboardButton(f'Closed Tickets - {len(closed_tickets)}', switch_inline_query_current_chat="closed")
                 ]
             ]
         )

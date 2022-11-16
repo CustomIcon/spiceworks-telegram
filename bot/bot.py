@@ -36,6 +36,7 @@ class bot(Client):
                 'Connection': 'Keep-Alive'
             }
         )
+        self.cache = {}
 
         super().__init__(
             name,
@@ -68,7 +69,7 @@ class bot(Client):
         req = await self.aioclient.get(
             f'{self.url}/api/tickets/{ticket_id}.json'
         ) if ticket_id else await self.aioclient.get(
-            f'{self.url}/api/tickets.json?filter={filter_id or spiceworks.types.Ticket.ALL}'
+            f'{self.url}/api/tickets.json?{filter_id or spiceworks.types.Ticket.ALL}'
         )
         return await req.json()
 

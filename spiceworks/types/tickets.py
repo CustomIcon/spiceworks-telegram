@@ -1,21 +1,21 @@
 class Ticket:
-    CLOSED = "closed"
+    CLOSED = "filter=closed"
     "Closed Tickets"
     
-    OPEN = "open"
+    OPEN = "filter=open"
     "Curently Opened tickets"
     
-    ACTIVE = "active"
+    ACTIVE = "filter=active"
     "Active Tickets"
     
-    WAITING = "waiting"
+    WAITING = "filter=waiting"
     "Waiting tickts"
     
-    PAST_DUE = "past_due"
+    PAST_DUE = "filter=past_due"
     "Past due tickets"
     
-    RECENT ="recent"
+    RECENT ="filter=recent"
     "Rectnly Updated Tickets"
     
-    ALL = "all"
+    ALL = ""
     "All Tickets"
