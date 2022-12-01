@@ -1,13 +1,13 @@
 from pyrogram import types
 
-def GetOpt(status: str):
+def GetOpt(status: str, ticket_id: int):
     return [
         types.InlineKeyboardButton(
-            '❌ Close', 'operation_close'
+            '❌ Close', f'operation_close_{ticket_id}'
         ),
         ] if status == "open" else [
             types.InlineKeyboardButton(
                 '🔓 Re-Open',
-                'operation_open'
+                f'operation_open_{ticket_id}'
             ),
         ]

@@ -34,7 +34,11 @@ async def _(_, message: types.Message):
                 ),
             ]
         ]
-    reply_markup.append(GetOpt(status=ticket["status"]))
+    reply_markup.append(GetOpt(status=ticket["status"], ticket_id=ticket["id"]))
+    try:
+        assignee = ticket["assignee"]["email"]
+    except KeyError:
+        assignee = "None"
     return await message.reply(
         text=text.format(
             ticket_id=ticket["id"],
@@ -42,7 +46,7 @@ async def _(_, message: types.Message):
             creator_firstname=ticket["creator"]["first_name"],
             creator_lastname=ticket["creator"]["last_name"],
             creator_email=ticket["creator"]["email"],
-            assignee=ticket["assignee"]["email"],
+            assignee=assignee,
             summary=ticket["summary"],
             description=ticket['description']
         ),
@@ -68,7 +72,11 @@ async def _(_, query: types.CallbackQuery):
                 ),
             ]
         ]
-    reply_markup.append(GetOpt(status=ticket["status"]))
+    reply_markup.append(GetOpt(status=ticket["status"], ticket_id=ticket["id"]))
+    try:
+        assignee = ticket["assignee"]["email"]
+    except KeyError:
+        assignee = "None"
     return await query.message.edit(
         text=text.format(
             ticket_id=ticket["id"],
@@ -76,7 +84,7 @@ async def _(_, query: types.CallbackQuery):
             creator_firstname=ticket["creator"]["first_name"],
             creator_lastname=ticket["creator"]["last_name"],
             creator_email=ticket["creator"]["email"],
-            assignee=ticket["assignee"]["email"],
+            assignee=assignee,
             summary=ticket["summary"],
             description=ticket['description']
         ),
